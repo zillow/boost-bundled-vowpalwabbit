@@ -13,6 +13,9 @@
 
 # Compiled Dynamic libraries
 *.so
+!libboost_program_options.so
+!libboost_python3.so
+!libpython3.6m.so
 *.dylib
 *.dll
 
