@@ -400,7 +400,7 @@ float dense_dot(float* v1, v_array<float> v2, size_t n)
 }
 
 
-void predict (svm_params& params, svm_example** ec_arr, float* scores, size_t n)
+void predict(svm_params& params, svm_example** ec_arr, float* scores, size_t n)
 {
   svm_model* model = params.model;
   for(size_t i = 0; i < n; i++)
@@ -410,7 +410,7 @@ void predict (svm_params& params, svm_example** ec_arr, float* scores, size_t n)
   }
 }
 
-void predict(svm_params& params, base_learner &, example& ec)
+void predict(svm_params& params, single_learner &, example& ec)
 {
   flat_example* fec = flatten_sort_example(*(params.all),&ec);
   if(fec)
@@ -434,7 +434,7 @@ size_t suboptimality(svm_model* model, double* subopt)
   double max_val = 0;
   for(size_t i = 0; i < model->num_support; i++)
   {
-    double tmp = model->alpha[i]*model->support_vec[i]->ex.l.simple.label;
+    float tmp = model->alpha[i]*model->support_vec[i]->ex.l.simple.label;
 
     if((tmp < model->support_vec[i]->ex.l.simple.weight && model->delta[i] < 0) || (tmp > 0 && model->delta[i] > 0))
       subopt[i] = fabs(model->delta[i]);
@@ -782,7 +782,7 @@ void train(svm_params& params)
   //params.all->opts_n_args.trace_message<<params.model->support_vec[0]->example_counter<<endl;
 }
 
-void learn(svm_params& params, base_learner&, example& ec)
+void learn(svm_params& params, single_learner&, example& ec)
 {
   flat_example* fec = flatten_sort_example(*(params.all),&ec);
   if(fec)
@@ -823,7 +823,7 @@ void free_svm_model(svm_model* model)
     // When the call to allocation is replaced by (a) 'new svm_example()' and deallocated using (b) 'operator delete (model->support_vect[i])', the warning goes away.
     // Disable SDL warning.
     //    #pragma warning(disable:6001)
-    free(model->support_vec[i]);
+    free_it(model->support_vec[i]);
     //  #pragma warning(default:6001)
 
     model->support_vec[i] = 0;
@@ -913,7 +913,7 @@ LEARNER::base_learner* kernel_svm_setup(arguments& arg)
 
   params->all->weights.stride_shift(0);
 
-  learner<svm_params>& l = init_learner(params, learn, predict, 1);
+  learner<svm_params,example>& l = init_learner(params, learn, predict, 1);
   l.set_save_load(save_load);
   l.set_finish(finish);
   return make_base(l);

@@ -60,7 +60,7 @@ $(PYLIBVW): pylibvw.o  ../vowpalwabbit/libvw.a
 
 pylibvw.o: pylibvw.cc
 	$(info Using Python $(PYTHON_VERSION))
-	$(CXX) -std=c++0x $(PYTHON_INCLUDE) $(BOOST_INCLUDE) $(JSON_INCLUDE) -fPIC -c pylibvw.cc -o pylibvw.o
+	$(CXX) -std=c++0x $(PYTHON_INCLUDE) $(BOOST_INCLUDE) $(JSON_INCLUDE) -I ../explore -fPIC -c pylibvw.cc -o pylibvw.o
 
 clean:
 	rm -f *.o $(PYLIBVW)
